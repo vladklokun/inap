@@ -1,0 +1,44 @@
+#include <stdio.h>
+
+#include "password.h"
+
+int main(int argc, char *argv[])
+{
+	uint16_t wordnum = 6;
+	uint16_t pwnum = 1;
+	char dictpath[] = "dict/english";
+	char sep[] = " ";
+
+	struct Dictionary *dp = NULL;
+	struct Password *pp = NULL;
+
+	FILE *dfp = NULL;
+
+	dfp = fopen(dictpath, "r");
+	if (!dfp) {
+		perror("unable to open dictionary");
+
+		return 1;
+	}
+
+	dp = dictinit(dp, filewc(dfp));
+	dictloadfromfile(dp, dfp);
+
+	for (uint16_t i = 0; i < pwnum; i++) {
+		pp = passinit(pp);
+		
+		passgen(pp, dp, wordnum, sep);
+		passprint(pp);
+		
+		passfree(pp);
+	}
+	dictfree(dp);
+
+	if (fclose(dfp) == EOF) {
+		perror("unable to close dictionary");
+		
+		return 1;
+	}
+
+	return 0;
+}
