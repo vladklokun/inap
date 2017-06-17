@@ -6,7 +6,7 @@
 #  define SSIZE_MAX (SIZE_MAX/2 -1)
 # endif
 /*
- * This global variable is a file descriptor for urandom.
+ * This global variable is a file descriptor for /dev/urandom.
  */
 static int urandomfd;
 
@@ -25,9 +25,9 @@ sysranddevclose(void)
 }
 
 /* 
- * This function fills buffer buf with buflen bytes from /dev/urandom. Intended
- * for any OS that doesn't have an entropy supplying syscall (e.g macOS).
- * Assumes POSIX environment.
+ * This function fills buffer starting at buf with buflen bytes
+ * from /dev/urandom. Intended for any OS that doesn't have an entropy
+ * supplying syscall (e.g macOS). Assumes POSIX environment.
  */
 ssize_t
 getdevrandom(const int fd, void *buf, size_t buflen)
@@ -48,17 +48,17 @@ uint32_t
 sysrand(void)
 {
 	uint32_t r = 0;
-	int readb = 0;
+	int readbcnt = 0;
 
 	for (;;) {
 		assert(sizeof(r) <= 256U);
-#if !defined(HAVE_GETRANDOM)
-		readb = getdevrandom(urandomfd, &r, sizeof(r));
+#if !defined(HAVE_GETRANDOM) && !defined(HAVE_SAFE_ARC4RANDOM)
+		readbcnt = getdevrandom(urandomfd, &r, sizeof(r));
 #else
-		readb = syscall(SYS_getrandom, &r, sizeof(r), 0);
+		readbcnt = syscall(SYS_getrandom, &r, sizeof(r), 0);
 #endif
 
-		if (readb >= 0 && (errno != EINTR || errno != EAGAIN))
+		if (readbcnt >= 0 && (errno != EINTR || errno != EAGAIN))
 			break;
 	}
 

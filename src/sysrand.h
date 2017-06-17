@@ -4,14 +4,14 @@
 #include <assert.h>
 #include <sys/syscall.h>
 
-#if !defined(HAVE_GETRANDOM)
+#if !defined(HAVE_GETRANDOM) && !defined(HAVE_SAFE_ARC4RANDOM)
 # include <sys/stat.h> /* open() */
 # include <fcntl.h> /* open() */
 
 # include <limits.h> /* SSIZE_MAX */
 #endif
 
-#if !defined(HAVE_GETRANDOM)
+#if !defined(HAVE_GETRANDOM) & !defined(HAVE_SAFE_ARC4RANDOM)
 int sysranddevopen(void);
 int sysranddevclose(void);
 ssize_t getdevrandom(const int fd, void *buf, size_t buflen);
