@@ -52,7 +52,11 @@ sysrand(void)
 
 	for (;;) {
 		assert(sizeof(r) <= 256U);
+#if !defined(HAVE_GETRANDOM)
+		readb = getdevrandom(urandomfd, &r, sizeof(r));
+#else
 		readb = syscall(SYS_getrandom, &r, sizeof(r), 0);
+#endif
 
 		if (readb >= 0 && (errno != EINTR || errno != EAGAIN))
 			break;

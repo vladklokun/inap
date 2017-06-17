@@ -40,6 +40,12 @@ int main(int argc, char *argv[])
 		}
 	}
 
+#if !defined(HAVE_GETRANDOM) && !defined(HAVE_SAFE_ARC4RANDOM)
+	if (sysranddevopen() == -1) {
+		perror("unable to open urandom");
+		return 1;
+	}
+#endif
 	dfp = fopen(dictpath, "r");
 	if (!dfp) {
 		perror("unable to open dictionary");
@@ -73,6 +79,10 @@ int main(int argc, char *argv[])
 		
 		return 1;
 	}
+
+#if !defined(HAVE_GETRANDOM) && !defined(HAVE_SAFE_ARC4RANDOM)
+	sysranddevclose();
+#endif
 
 	return 0;
 }
