@@ -25,8 +25,11 @@ filewc(FILE *fp)
 struct Dictionary
 *dictinit(struct Dictionary *dp, size_t capacity)
 {
-	if (capacity == 0)
+	if (capacity == 0) {
+		fputs("dictinit(): attempting to allocate 0 size dict\n",
+		      stderr);
 		return NULL;
+	}
 
 	dp = malloc(sizeof(*dp));
 	if (dp == NULL) {
